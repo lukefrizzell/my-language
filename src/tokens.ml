@@ -8,56 +8,37 @@ type token =
   | Operator of operator
   | Number of int64
 
-let type_order (tok : token) : int = 
-  match tok with
-  | Number _ -> 0
-  | Operator _ -> 1 
+let op_to_str (op: operator) : string =
+  match op with
+  | Plus -> "+"
+  | Minus -> "-"
+  | Multiply -> "*"
+  | Divide -> "/"
 
-let compare_token (tok1 : token) (tok2 : token) =
-  match (tok1, tok2) with
-  | (Operator op1, Operator op2) -> compare op1 op2
-  | (Number i1, Number i2) -> compare i1 i2
-  | (t1, t2) -> compare (type_order t1) (type_order t2)
+  let is_num s =
+    Str.string_match (Str.regexp "[0-9]+") s 0
 
-module TokenCompare = struct
-  type t = token
-  let compare = compare_token
-end
-
-module TokenMap = Map.Make(TokenCompare)
-
-let tokens = ref TokenMap.empty
-
-let add_token (tok : token) (st : string) : unit =
-  tokens := TokenMap.add tok st !tokens
-
-let init_token_map = 
-  let _ = add_token (Operator Plus) "+";
-  add_token (Operator Minus) "-";
-  add_token (Operator Multiply) "*";
-  add_token (Operator Divide) "/"; 
-  in ()
+  let str_to_token (str: string): token option =
+    match str with
+    | "+" -> Some (Operator Plus)
+    | "*" -> Some (Operator Multiply)
+    | "/" -> Some (Operator Divide)
+    | "-" -> Some (Operator Minus)
+    | str when is_num str -> Some (Number (Int64.of_string str))
+    | _ -> None
 
 let token_to_string(tok : token) : string =
   match tok with
-  | Operator _ -> TokenMap.find tok !tokens
+  | Operator op -> op_to_str op
   | Number i -> Int64.to_string i
-
-let rec string_to_token (st_match : string) (token_list : (token * string) list) : token option =
-  if Str.string_match (Str.regexp "[0-9]+") st_match 0 then Some (Number (Int64.of_string st_match)) else
-  match token_list with
-  | [] -> None
-  | (tok, st) :: rest -> if st_match = st then Some tok 
-      else string_to_token st_match rest
 
 exception SyntaxError of string
 
 let rec process_buffer (buffer : char list) : token = 
   let st = String.concat "" (List.map (String.make 1) buffer) in
-    let token_list = TokenMap.bindings !tokens in
-    (match string_to_token st token_list with
+  match str_to_token st with
     | Some v -> v
-    | None -> raise (SyntaxError st))
+    | None -> raise (SyntaxError st)
 
 and lex_inner (chars : char list) (buffer : char list) : token list = 
   match chars with
