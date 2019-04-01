@@ -1,4 +1,2 @@
 _build
-src/*.native
-src/*.byte
-src/*.o
+tokens

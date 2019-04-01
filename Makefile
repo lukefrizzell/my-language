@@ -1,3 +1,6 @@
 .PHONY: default
-default:
-	make -C src
+default: tokens.native
+
+%.native:
+	ocamlbuild -use-ocamlfind $@
+	mv $@ $*

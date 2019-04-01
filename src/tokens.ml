@@ -19,6 +19,7 @@ let op_to_str (op: operator) : string =
     Str.string_match (Str.regexp "[0-9]+") s 0
 
   let str_to_token (str: string): token option =
+    print_string str;
     match str with
     | "+" -> Some (Operator Plus)
     | "*" -> Some (Operator Multiply)
@@ -51,6 +52,6 @@ let lex (st: string) : token list =
   lex_inner chars []
 
 let _ = 
-  let test_string = "1 + 2" in
+  let test_string = "1 +() 2" in
   let test_tokens = lex test_string in
   List.iter print_string (List.map token_to_string test_tokens)
