@@ -1,5 +1,5 @@
 .PHONY: default
-default: my-language.native
+default: tokens.native
 
 %.native:
 	ocamlbuild -use-ocamlfind $@
