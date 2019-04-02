@@ -15,6 +15,6 @@ Number ::= \
   
   ## Example
   
-  ( 0 + 1 ) * (4 / 2) - 1
+  ( 0 + 1 ) * ( 4 / 2 ) - 1
   
   Spacing is part of the syntax currently
